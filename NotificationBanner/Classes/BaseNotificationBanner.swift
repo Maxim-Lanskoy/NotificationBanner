@@ -415,16 +415,15 @@ open class BaseNotificationBanner: UIView {
                 initialSpringVelocity: 1,
                 options: [.curveLinear, .allowUserInteraction],
                 animations: {
-                    BannerHapticGenerator.generate(self.haptic)
-                    self.frame = self.bannerPositionFrame.endFrame
+                    self.bannerQueue.updateAllBannersFrames()
+                    //BannerHapticGenerator.generate(self.haptic)
+                    //self.frame = self.bannerPositionFrame.endFrame
             }) { (completed) in
-
                 NotificationCenter.default.post(
                     name: BaseNotificationBanner.BannerDidAppear,
                     object: self,
                     userInfo: self.notificationUserInfo
                 )
-                
                 self.delegate?.notificationBannerDidAppear(self)
 
                 /* We don't want to add the selector if another banner was queued in front of it

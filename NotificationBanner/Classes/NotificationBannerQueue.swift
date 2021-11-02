@@ -31,10 +31,10 @@ open class NotificationBannerQueue: NSObject {
     public static let `default` = NotificationBannerQueue()
 
     /// The notification banners currently placed on the queue
-    private(set) var banners: [BaseNotificationBanner] = []
+    public var banners: [BaseNotificationBanner] = []
 
     /// The notification banners currently placed on the queue
-    private(set) var maxBannersOnScreenSimultaneously: Int = 1
+    public var maxBannersOnScreenSimultaneously: Int = 1
 
     /// The current number of notification banners on the queue
     public var numberOfBanners: Int {
@@ -66,7 +66,14 @@ open class NotificationBannerQueue: NSObject {
             }
 
         } else {
-            banner.show(placeOnQueue: false, bannerPosition: bannerPosition)
+            
+            let bannersCount = banners.filter { $0.isDisplaying }.count
+            if bannersCount <= maxBannersOnScreenSimultaneously {
+                banner.show(placeOnQueue: false, bannerPosition: bannerPosition)
+            } else {
+                banner.show(placeOnQueue: false, bannerPosition: bannerPosition)
+                banners.last?.dismiss()
+            }
 
             if let firstBanner = firstNotDisplayedBanner() {
                 firstBanner.suspend()
@@ -87,6 +94,15 @@ open class NotificationBannerQueue: NSObject {
             banners.remove(at: index)
         }
 
+        banners.forEach {
+            $0.updateBannerPositionFrames()
+            if $0.isDisplaying {
+                $0.animateUpdatedBannerPositionFrames()
+            }
+        }
+    }
+    
+    public func updateAllBannersFrames() {
         banners.forEach {
             $0.updateBannerPositionFrames()
             if $0.isDisplaying {
