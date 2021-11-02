@@ -408,16 +408,16 @@ open class BaseNotificationBanner: UIView {
             self.isDisplaying = true
 
             let bannerIndex = Double(bannerQueue.banners.firstIndex(of: self) ?? 0) + 1
-            UIView.animate(
-                withDuration: animationDuration * bannerIndex,
-                delay: 0.0,
-                usingSpringWithDamping: 0.7,
-                initialSpringVelocity: 1,
+            UIView.animate(withDuration: animationDuration * bannerIndex,
+                delay: 0.0, usingSpringWithDamping: 0.7,  initialSpringVelocity: 1,
                 options: [.curveLinear, .allowUserInteraction],
                 animations: {
-                    self.bannerQueue.updateAllBannersFrames()
-                    //BannerHapticGenerator.generate(self.haptic)
-                    //self.frame = self.bannerPositionFrame.endFrame
+                    BannerHapticGenerator.generate(self.haptic)
+                    if self.bannerQueue.banners.filter({$0.isDisplaying}).count == 0 {
+                        self.frame = self.bannerPositionFrame.endFrame
+                    } else {
+                        self.bannerQueue.updateAllBannersFrames()
+                    }
             }) { (completed) in
                 NotificationCenter.default.post(
                     name: BaseNotificationBanner.BannerDidAppear,
